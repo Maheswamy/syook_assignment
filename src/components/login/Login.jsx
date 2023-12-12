@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { TextField, Stack, Paper, Button } from "@mui/material";
 import { runValidation } from "./loginValidation";
 import users from "../../userdata/users.json";
 import { useNavigate } from "react-router-dom";
 import { fetchDish } from "../../utli/fetchDishes";
+import { DishContext } from "../../Contexts/Context";
+import { UserContext } from "./../../Contexts/Context";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [formErrors, setFormErrors] = useState({});
+  const { dishDispatch } = useContext(DishContext);
+  const { userDispatch } = useContext(UserContext);
   const navigate = useNavigate();
 
   const setFormErrorHandler = (errors) => {
@@ -29,11 +33,9 @@ const Login = () => {
       });
 
       if (authenicationResult) {
+        userDispatch({ type: "SET_USER", payload: authenicationResult });
         localStorage.setItem("user", JSON.stringify(authenicationResult));
-        localStorage.getItem("dishes")
-          ? console.log(JSON.parse(localStorage.getItem("dishes")))
-          : fetchDish();
-        navigate("/dishs");
+        fetchDish(dishDispatch,navigate);
       } else {
         setFormErrorHandler({
           username: "invalid username or password",
