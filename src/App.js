@@ -11,28 +11,48 @@ import LoginContainer from "./components/login/LoginContainer";
 
 function App() {
   const [dishState, dishDispatch] = useReducer(dishReducer, []);
-  const [userState, userDispatch] = useReducer(userReducer, {user:{},myVotes:[]});
+  const [userState, userDispatch] = useReducer(userReducer, {
+    user: {},
+    myVotes: [],
+  });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      userDispatch({
+        type: "SET_USER",
+        payload: JSON.parse(localStorage.getItem("user")),
+      });
+    } else {
+      navigate("/");
+    }
+  }, []);
 
   useEffect(() => {
     if (localStorage.getItem("dishes")) {
       dishDispatch({
         type: "GET_DISHES",
-        payload: localStorage.getItem("dishes"),
+        payload: JSON.parse(localStorage.getItem("dishes")),
       });
     } else {
       fetchDish(dishDispatch);
     }
-    
-    if (localStorage.getItem("user")) {
+  }, []);
+
+  useEffect(() => {
+    if (
+      localStorage.getItem(
+        `${JSON.parse(localStorage.getItem("user")).username}`
+      )
+    )
       userDispatch({
-        type: "SET_USER",
-        payload: JSON.parse(localStorage.getItem("user")),
-        x:'mahendra'
+        type: "SET_MYVOTES",
+        payload: JSON.parse(
+          localStorage.getItem(
+            `${JSON.parse(localStorage.getItem("user")).username}`
+          )
+        ),
       });
-    } else {
-      navigate("/");
-    }
   }, []);
 
   return (

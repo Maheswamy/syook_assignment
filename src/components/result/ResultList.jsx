@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Stack, Typography, Paper } from "@mui/material";
 import ResultItem from "./ResultItem";
+import { UserContext, DishContext } from "../../Contexts/Context";
 
 const ResultList = () => {
-  const [allVotes, setAllVotes] = useState([]);
+  const { dishState } = useContext(DishContext);
+  const {userState}=useContext(UserContext)
 
-  useEffect(() => {
-    const storedAllVotes = JSON.parse(localStorage.getItem("result")) || [];
-    setAllVotes(storedAllVotes);
-  }, []);
-
-  console.log(allVotes);
+  console.log(userState);
 
   return (
     <Stack container spacing={3}>
@@ -35,9 +32,18 @@ const ResultList = () => {
           </Typography>
         </Stack>
       </Paper>
-      {allVotes.map((ele) => (
-        <ResultItem key={ele.id} {...ele} />
-      ))}
+      {dishState
+        .sort((a, b) => b.points - a.points)
+        .map((ele) => {
+          const selected = userState.myVotes.find((e) => e.id === ele.id);
+          return (
+            <ResultItem
+              key={ele.id}
+              {...ele}
+              selected={selected ? selected : null}
+            />
+          );
+        })}
     </Stack>
   );
 };

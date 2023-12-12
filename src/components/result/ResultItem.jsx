@@ -1,18 +1,18 @@
 import { Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 
-const ResultItem = ({ id, dishName, points }) => {
+const ResultItem = ({ id, dishName, points ,selected}) => {
   return (
     <Paper>
-      <Stack direction={'row'} justifyContent={'space-between'} p={3}>
+      <Stack direction={'row'} justifyContent={'space-between'} p={3} bgcolor={selected&&'green'}>
         <Typography variant="body1" color="initial">
-          id:{id}
+          {id}
         </Typography>
         <Typography variant="body1" color="initial">
-          Dish name:{dishName}
+          {dishName}
         </Typography>
         <Typography variant="body1" color="initial">
-          Points:{points}
+          {points}
         </Typography>
       </Stack>
     </Paper>

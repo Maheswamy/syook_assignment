@@ -5,12 +5,17 @@ import { DishContext, UserContext } from "../../Contexts/Context";
 import { useNavigate } from "react-router-dom";
 
 const Dishlist = () => {
+  const { userState, userDispatch } = useContext(UserContext);
   const [voted, setVoted] = useState([]);
-  const { dishState } = useContext(DishContext);
-  const { userState } = useContext(UserContext);
+  const { dishState, dishDispatch } = useContext(DishContext);
   const navigate = useNavigate();
 
-  console.log(dishState);
+  useEffect(() => {
+    console.log(userState.myVotes, "indiess");
+    if (userState.myVotes.lenght > 0) {
+      setVoted(userState.myVotes);
+    }
+  }, []);
 
   const polledDishHandler = (value) => {
     const isVoteLimitReached = voted.length === 3;
@@ -40,15 +45,8 @@ const Dishlist = () => {
     }
   };
 
-  useEffect(() => {
-    console.log(voted);
-  }, [voted]);
-
   const handlePollSubmit = () => {
-    console.log(userState);
-    localStorage.setItem(`${userState?.username}`, JSON.stringify(voted));
-
-    const allVotes = JSON.parse(localStorage.getItem("result")) || dishState;
+    console.log(voted);
 
     const calculateTotalRank = () => {
       return voted.reduce((pv, cv) => {
@@ -58,11 +56,10 @@ const Dishlist = () => {
         return pv;
       }, {});
     };
-
     const totalRank = calculateTotalRank();
 
-    const result = allVotes.map((ele) => {
-      if (voted[ele.id]) {
+    const result = dishState.map((ele) => {
+      if (totalRank[ele.id]) {
         console.log(ele.points);
         return {
           ...ele,
@@ -71,15 +68,17 @@ const Dishlist = () => {
             : totalRank[ele.id],
         };
       } else {
-        return { ...ele, points: 0 };
+        return { ...ele, points: ele.points > 0 ? ele.points : 0 };
       }
     });
-
-    console.log(result, totalRank);
-    localStorage.setItem("result", JSON.stringify([...result]));
-
+    localStorage.setItem(`${userState.user.username}`, JSON.stringify(voted));
+    localStorage.setItem("dishes", JSON.stringify(result));
+    userDispatch({ type: "SET_MYVOTES", payload: voted });
+    dishDispatch({ type: "GET_DISHES", payload: result });
     navigate("/result");
   };
+
+  
 
   return (
     <>
@@ -89,7 +88,11 @@ const Dishlist = () => {
         <Grid container gap={3}>
           {dishState?.map((ele) => (
             <Grid item key={ele.id}>
-              <Dishcard {...ele} polledDishHandler={polledDishHandler} />
+              <Dishcard
+                {...ele}
+                polledDishHandler={polledDishHandler}
+                slected={voted.find((e) => e.id === ele.id)?.rank}
+              />
             </Grid>
           ))}
           <Grid item>

@@ -1,18 +1,21 @@
 import { Stack, Paper, Button, Typography, Box } from "@mui/material";
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "./../../Contexts/Context";
+import { DishContext, UserContext } from "./../../Contexts/Context";
 
 const Navbar = () => {
   const { userState, userDispatch } = useContext(UserContext);
+  const { dishDispatch } = useContext(DishContext);
+
   const navigation = useNavigate();
 
-  console.log(userState)
+  console.log(userState);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    console.log("jkjk");
     userDispatch({ type: "USER_LOGOUT" });
+    dishDispatch({ type: "USER_LOGOUT" });
+
     navigation("/");
   };
   return (
@@ -35,7 +38,7 @@ const Navbar = () => {
             DISH POLL
           </Typography>
         </Box>
-        {Object.values(userState).length > 0 && (
+        {Object.values(userState.user).length > 0 && (
           <Box>
             <Link to="/result">
               <Button variant="h6" color="initial">

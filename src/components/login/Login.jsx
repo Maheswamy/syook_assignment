@@ -35,7 +35,15 @@ const Login = () => {
       if (authenicationResult) {
         userDispatch({ type: "SET_USER", payload: authenicationResult });
         localStorage.setItem("user", JSON.stringify(authenicationResult));
-        fetchDish(dishDispatch,navigate);
+        if (localStorage.getItem("dishes")) {
+          dishDispatch({
+            type: "GET_DISHES",
+            payload: JSON.parse(localStorage.getItem("dishes")),
+          });
+          navigate("/dishes");
+        } else {
+          fetchDish(dishDispatch, navigate);
+        }
       } else {
         setFormErrorHandler({
           username: "invalid username or password",
@@ -50,7 +58,6 @@ const Login = () => {
       component={"form"}
       onSubmit={handleLogin}
       sx={{ width: "345px", padding: "10px" }}
-      
     >
       <Stack spacing={2}>
         <TextField
