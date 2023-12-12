@@ -42,7 +42,7 @@ function App() {
   useEffect(() => {
     if (
       localStorage.getItem(
-        `${JSON.parse(localStorage.getItem("user")).username}`
+        `${JSON.parse(localStorage.getItem("user"))?.username}`
       )
     )
       userDispatch({
