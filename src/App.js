@@ -6,6 +6,7 @@ import { DishContext, UserContext } from "./Contexts/Context";
 import { dishReducer, userReducer } from "./reducers/reducers";
 import { Container } from "@mui/material";
 import { fetchDish } from "./utli/fetchDishes";
+import ResultList from "./components/result/ResultList";
 
 function App() {
   const [dishState, dishDispatch] = useReducer(dishReducer, []);
@@ -21,9 +22,9 @@ function App() {
     } else {
       fetchDish(dishDispatch);
     }
-
+    console.log(JSON.parse(localStorage.getItem("user")))
     if (localStorage.getItem("user")) {
-      dishDispatch({ type: "GET_USER", payload: localStorage.getItem("user") });
+      dishDispatch({ type: "SET_USER", payload: JSON.parse(localStorage.getItem("user")) });
     } else {
       navigate("/");
     }
@@ -37,6 +38,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/dishes" element={<Dishlist />} />
+              <Route path="/result" element={<ResultList />} />
             </Routes>
           </Container>
         </DishContext.Provider>
