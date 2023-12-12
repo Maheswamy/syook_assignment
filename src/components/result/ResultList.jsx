@@ -32,7 +32,7 @@ const ResultList = () => {
           </Typography>
         </Stack>
       </Paper>
-      {dishState
+      {[...dishState]
         .sort((a, b) => b.points - a.points)
         .map((ele) => {
           const selected = userState.myVotes.find((e) => e.id === ele.id);

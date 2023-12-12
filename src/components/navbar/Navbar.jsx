@@ -25,6 +25,7 @@ const Navbar = () => {
         position: "sticky",
         top: 0,
         backgroundColor: "#fff",
+        zIndex: 1000,
       }}
     >
       <Stack

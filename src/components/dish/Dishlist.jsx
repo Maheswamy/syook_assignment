@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Grid, Button, CircularProgress } from "@mui/material";
+import { Grid, Button, CircularProgress, Stack, Box } from "@mui/material";
 import Dishcard from "./Dishcard";
 import { DishContext, UserContext } from "../../Contexts/Context";
 import { useNavigate } from "react-router-dom";
@@ -11,13 +11,12 @@ const Dishlist = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(userState.myVotes, "indiess");
     if (userState.myVotes.lenght > 0) {
-      setVoted(userState.myVotes);
+      setVoted([...userState.myVotes]);
     }
   }, []);
 
-  const polledDishHandler = (value) => {
+  const handleNewVote = (value) => {
     const isVoteLimitReached = voted.length === 3;
 
     if (isVoteLimitReached) {
@@ -45,9 +44,24 @@ const Dishlist = () => {
     }
   };
 
-  const handlePollSubmit = () => {
-    console.log(voted);
+  const polledDishHandler = (value) => {
+    return handleNewVote(value);
+  };
 
+  const handlePollSubmit = () => {
+    let newDishes = dishState;
+    if (userState.myVotes.length > 0) {
+      console.log(voted);
+      newDishes = dishState.map((ele) => {
+        const oldVote = userState.myVotes.find((e) => e.id === ele.id);
+        if (oldVote) {
+          return { ...ele, points: ele.points - oldVote.rank };
+        } else {
+          return { ...ele };
+        }
+      });
+    }
+    console.log(newDishes);
     const calculateTotalRank = () => {
       return voted.reduce((pv, cv) => {
         if (!pv[cv.id]) {
@@ -60,7 +74,6 @@ const Dishlist = () => {
 
     const result = dishState.map((ele) => {
       if (totalRank[ele.id]) {
-        console.log(ele.points);
         return {
           ...ele,
           points: ele.points
@@ -78,24 +91,35 @@ const Dishlist = () => {
     navigate("/result");
   };
 
-  
+  const renderDishCards = () => {
+    return dishState?.map((ele) => {
+      const selected = userState.myVotes.find((e) => e.id === ele.id)?.rank;
+
+      return (
+        <Grid item key={ele.id}>
+          <Dishcard
+            {...ele}
+            polledDishHandler={polledDishHandler}
+            selected={
+              selected
+                ? selected
+                : voted.find((e) => e.id === ele.id)
+                ? voted.find((e) => e.id === ele.id).rank
+                : null
+            }
+          />
+        </Grid>
+      );
+    });
+  };
 
   return (
     <>
       {dishState.length === 0 ? (
         <CircularProgress />
       ) : (
-        <Grid container gap={3}>
-          {dishState?.map((ele) => (
-            <Grid item key={ele.id}>
-              <Dishcard
-                {...ele}
-                polledDishHandler={polledDishHandler}
-                slected={voted.find((e) => e.id === ele.id)?.rank}
-              />
-            </Grid>
-          ))}
-          <Grid item>
+        <Stack container gap={3} direction={"column"}>
+          <Box>
             <Button
               variant="contained"
               color="primary"
@@ -104,8 +128,11 @@ const Dishlist = () => {
             >
               Submit
             </Button>
+          </Box>
+          <Grid container gap={3}>
+            {renderDishCards()}
           </Grid>
-        </Grid>
+        </Stack>
       )}
     </>
   );
