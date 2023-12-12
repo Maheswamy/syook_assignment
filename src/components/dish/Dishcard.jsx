@@ -18,7 +18,7 @@ const Dishcard = ({ id, dishName, description, image, polledDishHandler }) => {
   };
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: 345,height: '100%' }}>
       <CardMedia sx={{ height: 140 }} image={image} title={description} />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">

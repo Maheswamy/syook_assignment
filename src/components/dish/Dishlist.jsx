@@ -10,6 +10,8 @@ const Dishlist = () => {
   const { userState } = useContext(UserContext);
   const navigate = useNavigate();
 
+  console.log(dishState);
+
   const polledDishHandler = (value) => {
     const isVoteLimitReached = voted.length === 3;
 
@@ -46,24 +48,34 @@ const Dishlist = () => {
     console.log(userState);
     localStorage.setItem(`${userState?.username}`, JSON.stringify(voted));
 
-    const allVotes = JSON.parse(localStorage.getItem("allVotes")) || [];
+    const allVotes = JSON.parse(localStorage.getItem("result")) || dishState;
 
     const calculateTotalRank = () => {
-      return allVotes.reduce((pv, cv) => {
-        pv[cv.id] = (pv[cv.id] || 0) + cv.rank;
+      return voted.reduce((pv, cv) => {
+        if (!pv[cv.id]) {
+          pv[cv.id] = cv.rank;
+        }
         return pv;
       }, {});
     };
 
     const totalRank = calculateTotalRank();
 
-    const result = dishState
-      .map((ele) => ({
-        ...ele,
-        points: totalRank[ele.id] || 0,
-      }))
-      .sort((a, b) => b.points - a.points);
+    const result = allVotes.map((ele) => {
+      if (voted[ele.id]) {
+        console.log(ele.points);
+        return {
+          ...ele,
+          points: ele.points
+            ? ele.points + totalRank[ele.id]
+            : totalRank[ele.id],
+        };
+      } else {
+        return { ...ele, points: 0 };
+      }
+    });
 
+    console.log(result, totalRank);
     localStorage.setItem("result", JSON.stringify([...result]));
 
     navigate("/result");
@@ -71,11 +83,11 @@ const Dishlist = () => {
 
   return (
     <>
-      {!dishState ? (
+      {dishState.length === 0 ? (
         <CircularProgress />
       ) : (
         <Grid container gap={3}>
-          {dishState.map((ele) => (
+          {dishState?.map((ele) => (
             <Grid item key={ele.id}>
               <Dishcard {...ele} polledDishHandler={polledDishHandler} />
             </Grid>

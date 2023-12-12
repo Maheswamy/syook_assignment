@@ -1,16 +1,17 @@
-import Login from "./components/login/Login";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import Dishlist from "./components/dish/Dishlist";
 import { useEffect, useReducer } from "react";
 import { DishContext, UserContext } from "./Contexts/Context";
 import { dishReducer, userReducer } from "./reducers/reducers";
 import { Container } from "@mui/material";
 import { fetchDish } from "./utli/fetchDishes";
+import Dishlist from "./components/dish/Dishlist";
 import ResultList from "./components/result/ResultList";
+import Navbar from "./components/navbar/Navbar";
+import LoginContainer from "./components/login/LoginContainer";
 
 function App() {
   const [dishState, dishDispatch] = useReducer(dishReducer, []);
-  const [userState, userDispatch] = useReducer(userReducer, {});
+  const [userState, userDispatch] = useReducer(userReducer, {user:{},myVotes:[]});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,9 +23,13 @@ function App() {
     } else {
       fetchDish(dishDispatch);
     }
-    console.log(JSON.parse(localStorage.getItem("user")))
+    
     if (localStorage.getItem("user")) {
-      dishDispatch({ type: "SET_USER", payload: JSON.parse(localStorage.getItem("user")) });
+      userDispatch({
+        type: "SET_USER",
+        payload: JSON.parse(localStorage.getItem("user")),
+        x:'mahendra'
+      });
     } else {
       navigate("/");
     }
@@ -34,9 +39,10 @@ function App() {
     <div>
       <UserContext.Provider value={{ userState, userDispatch }}>
         <DishContext.Provider value={{ dishState, dishDispatch }}>
+          <Navbar />
           <Container maxWidth={"lg"}>
             <Routes>
-              <Route path="/" element={<Login />} />
+              <Route path="/" element={<LoginContainer />} />
               <Route path="/dishes" element={<Dishlist />} />
               <Route path="/result" element={<ResultList />} />
             </Routes>
