@@ -1,5 +1,4 @@
 
-
 export const runValidation = (username, password, setFormErrorHandler) => {
   const errors = {};
   if (username.trim().length === 0) {

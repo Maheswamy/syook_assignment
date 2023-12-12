@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { TextField, Stack, Paper, Button } from "@mui/material";
-import { runValidation } from "./ulti";
+import { runValidation } from "./loginValidation";
 import users from "../../userdata/users.json";
+import { useNavigate } from "react-router-dom";
+import { fetchDish } from "../../utli/fetchDishes";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [formErrors, setFormErrors] = useState({});
+  const navigate = useNavigate();
 
   const setFormErrorHandler = (errors) => {
     setFormErrors(errors);
@@ -26,7 +29,11 @@ const Login = () => {
       });
 
       if (authenicationResult) {
-        console.log(authenicationResult);
+        localStorage.setItem("user", JSON.stringify(authenicationResult));
+        localStorage.getItem("dishes")
+          ? console.log(JSON.parse(localStorage.getItem("dishes")))
+          : fetchDish();
+        navigate("/dishs");
       } else {
         setFormErrorHandler({
           username: "invalid username or password",
@@ -37,8 +44,12 @@ const Login = () => {
   };
 
   return (
-    <Paper component={"form"} onSubmit={handleLogin} sx={{width:'345px', padding:'10px'}} >
-      <Stack  spacing={2} >
+    <Paper
+      component={"form"}
+      onSubmit={handleLogin}
+      sx={{ width: "345px", padding: "10px" }}
+    >
+      <Stack spacing={2}>
         <TextField
           id="username"
           label="Username"
@@ -48,7 +59,7 @@ const Login = () => {
           helperText={formErrors?.username}
         />
         <TextField
-        type="password"
+          type="password"
           id="password"
           label="Password"
           value={password}
