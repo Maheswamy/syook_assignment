@@ -34,7 +34,14 @@ const Login = () => {
 
       if (authenicationResult) {
         userDispatch({ type: "SET_USER", payload: authenicationResult });
-        userDispatch({type:'SET_LOGGEDIN_VOTES',payload:JSON.parse(localStorage.getItem(`${authenicationResult.username}`))})
+        userDispatch({
+          type: "SET_LOGGEDIN_VOTES",
+          payload: localStorage.getItem(`${authenicationResult.username}`)
+            ? JSON.parse(
+                localStorage.getItem(`${authenicationResult.username}`)
+              )
+            : [],
+        });
         localStorage.setItem("user", JSON.stringify(authenicationResult));
         if (localStorage.getItem("dishes")) {
           dishDispatch({
@@ -61,7 +68,9 @@ const Login = () => {
       sx={{ width: "345px", padding: "10px" }}
     >
       <Stack spacing={2}>
-        <Typography variant="h3" color="initial">Login</Typography>
+        <Typography variant="h3" color="initial">
+          Login
+        </Typography>
         <TextField
           id="username"
           label="Username"
