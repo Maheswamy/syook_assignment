@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Stack, Typography, Paper } from "@mui/material";
 import ResultItem from "./ResultItem";
 import { UserContext, DishContext } from "../../Contexts/Context";
@@ -6,8 +6,6 @@ import { UserContext, DishContext } from "../../Contexts/Context";
 const ResultList = () => {
   const { dishState } = useContext(DishContext);
   const {userState}=useContext(UserContext)
-
-  console.log(userState);
 
   return (
     <Stack container spacing={3}>
@@ -35,7 +33,7 @@ const ResultList = () => {
       {[...dishState]
         .sort((a, b) => b.points - a.points)
         .map((ele) => {
-          const selected = userState.myVotes.find((e) => e.id === ele.id);
+          const selected = userState.loggedInUserVotes.find((e) => e.id === ele.id);
           return (
             <ResultItem
               key={ele.id}

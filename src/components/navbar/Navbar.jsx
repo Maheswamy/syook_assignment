@@ -6,16 +6,12 @@ import { DishContext, UserContext } from "./../../Contexts/Context";
 const Navbar = () => {
   const { userState, userDispatch } = useContext(UserContext);
   const { dishDispatch } = useContext(DishContext);
-
   const navigation = useNavigate();
-
-  console.log(userState);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     userDispatch({ type: "USER_LOGOUT" });
     dishDispatch({ type: "USER_LOGOUT" });
-
     navigation("/");
   };
   return (

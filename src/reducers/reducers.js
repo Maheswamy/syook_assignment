@@ -15,14 +15,14 @@ export const dishReducer = (state, action) => {
 export const userReducer = (state, action) => {
   switch (action.type) {
     case "SET_USER": {
-      console.log(action.payload);
       return { ...state, user: action.payload };
     }
-    case "SET_MYVOTES": {
-      return { ...state, myVotes: [...action.payload] };
+    case "SET_LOGGEDIN_VOTES": {
+      return { ...state, loggedInUserVotes: [...action.payload] };
     }
+
     case "USER_LOGOUT": {
-      return { user: {}, myVotes: [] };
+      return { user: {}, loggedInUserVotes: [] };
     }
     default: {
       return { ...state };

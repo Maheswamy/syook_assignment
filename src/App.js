@@ -8,12 +8,13 @@ import Dishlist from "./components/dish/Dishlist";
 import ResultList from "./components/result/ResultList";
 import Navbar from "./components/navbar/Navbar";
 import LoginContainer from "./components/login/LoginContainer";
+import CssBaseline from "@mui/material/CssBaseline";
 
 function App() {
   const [dishState, dishDispatch] = useReducer(dishReducer, []);
   const [userState, userDispatch] = useReducer(userReducer, {
     user: {},
-    myVotes: [],
+    loggedInUserVotes: [],
   });
   const navigate = useNavigate();
 
@@ -46,7 +47,7 @@ function App() {
       )
     )
       userDispatch({
-        type: "SET_MYVOTES",
+        type: "SET_LOGGEDIN_VOTES",
         payload: JSON.parse(
           localStorage.getItem(
             `${JSON.parse(localStorage.getItem("user")).username}`
@@ -59,6 +60,7 @@ function App() {
     <div>
       <UserContext.Provider value={{ userState, userDispatch }}>
         <DishContext.Provider value={{ dishState, dishDispatch }}>
+          <CssBaseline />
           <Navbar />
           <Container maxWidth={"lg"}>
             <Routes>

@@ -6,43 +6,82 @@ import { useNavigate } from "react-router-dom";
 
 const Dishlist = () => {
   const { userState, userDispatch } = useContext(UserContext);
-  const [voted, setVoted] = useState([]);
   const { dishState, dishDispatch } = useContext(DishContext);
+  console.log(userState);
+  const [votes, setVotes] = useState(
+    userState.loggedInUserVotes.lenght > 0 ? userState.loggedInUserVotes : []
+  );
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (userState.myVotes.lenght > 0) {
-      setVoted([...userState.myVotes]);
-    }
-  }, []);
+  // const handleNewVote = (value) => {
+  //   const isVoteLimitReached = votes.length === 3;
+  //   console.log(value, votes);
+  //   if (isVoteLimitReached) {
+  //     setVotes((prev) =>
+  //       prev.map((ele) =>
+  //         ele.id === value.id || ele.rank === value.rank
+  //           ? { ...value }
+  //           : { ...ele }
+  //       )
+  //     );
+  //   } else {
+  //     const hasDuplicateVote = votes.some(
+  //       (ele) => ele.id === value.id || ele.rank === value.rank
+  //     );
 
+  //     setVotes((prev) =>
+  //       hasDuplicateVote
+  //         ? prev.map((ele) =>
+  //             ele.id === value.id || ele.rank === value.rank
+  //               ? { ...value }
+  //               : { ...ele }
+  //           )
+  //         : [...prev, value]
+  //     );
+  //   }
+  // };
   const handleNewVote = (value) => {
-    const isVoteLimitReached = voted.length === 3;
+    const voteLimit = votes.length === 3;
 
-    if (isVoteLimitReached) {
-      setVoted((prev) =>
+    if (voteLimit) {
+      setVotes((prev) =>
         prev.map((ele) =>
-          ele.id === value.id || ele.rank === value.rank
-            ? { ...value }
-            : { ...ele }
+          ele.id === value.id ? { ...ele, rank: value.rank } : ele
         )
       );
     } else {
-      const hasDuplicateVote = voted.some(
-        (ele) => ele.id === value.id || ele.rank === value.rank
-      );
+      const VotedForDish = votes.some((ele) => ele.id === value.id);
 
-      setVoted((prev) =>
-        hasDuplicateVote
+      setVotes((prev) =>
+        VotedForDish
           ? prev.map((ele) =>
-              ele.id === value.id || ele.rank === value.rank
-                ? { ...value }
-                : { ...ele }
+              ele.id === value.id ? { ...ele, rank: value.rank } : ele
             )
           : [...prev, value]
       );
     }
   };
+
+  const calculatePoints = (rank) => {
+    switch (rank) {
+      case 30:
+        return 30;
+      case 20:
+        return 20;
+      case 10:
+        return 10;
+      default:
+        return 0;
+    }
+  };
+
+  useEffect(() => {
+    const updatedVotes = votes.map((vote) => ({
+      ...vote,
+      points: calculatePoints(vote.rank),
+    }));
+    setVotes(updatedVotes);
+  }, [votes]);
 
   const polledDishHandler = (value) => {
     return handleNewVote(value);
@@ -50,10 +89,11 @@ const Dishlist = () => {
 
   const handlePollSubmit = () => {
     let newDishes = dishState;
-    if (userState.myVotes.length > 0) {
-      console.log(voted);
+    if (userState.loggedInUserVotes.length > 0) {
       newDishes = dishState.map((ele) => {
-        const oldVote = userState.myVotes.find((e) => e.id === ele.id);
+        const oldVote = userState.loggedInUserVotes.find(
+          (e) => e.id === ele.id
+        );
         if (oldVote) {
           return { ...ele, points: ele.points - oldVote.rank };
         } else {
@@ -61,9 +101,8 @@ const Dishlist = () => {
         }
       });
     }
-    console.log(newDishes);
     const calculateTotalRank = () => {
-      return voted.reduce((pv, cv) => {
+      return votes.reduce((pv, cv) => {
         if (!pv[cv.id]) {
           pv[cv.id] = cv.rank;
         }
@@ -72,7 +111,7 @@ const Dishlist = () => {
     };
     const totalRank = calculateTotalRank();
 
-    const result = dishState.map((ele) => {
+    const result = newDishes.map((ele) => {
       if (totalRank[ele.id]) {
         return {
           ...ele,
@@ -84,16 +123,16 @@ const Dishlist = () => {
         return { ...ele, points: ele.points > 0 ? ele.points : 0 };
       }
     });
-    localStorage.setItem(`${userState.user.username}`, JSON.stringify(voted));
+    localStorage.setItem(`${userState.user.username}`, JSON.stringify(votes));
     localStorage.setItem("dishes", JSON.stringify(result));
-    userDispatch({ type: "SET_MYVOTES", payload: voted });
+    userDispatch({ type: "SET_LOGGEDIN_VOTES", payload: votes });
     dishDispatch({ type: "GET_DISHES", payload: result });
     navigate("/result");
   };
 
   const renderDishCards = () => {
     return dishState?.map((ele) => {
-      const selected = userState.myVotes.find((e) => e.id === ele.id)?.rank;
+      const selected = userState.loggedInUserVotes.find((e) => e.id === ele.id);
 
       return (
         <Grid item key={ele.id}>
@@ -103,8 +142,8 @@ const Dishlist = () => {
             selected={
               selected
                 ? selected
-                : voted.find((e) => e.id === ele.id)
-                ? voted.find((e) => e.id === ele.id).rank
+                : votes
+                ? votes.find((e) => e.id === ele.id)
                 : null
             }
           />
@@ -118,18 +157,19 @@ const Dishlist = () => {
       {dishState.length === 0 ? (
         <CircularProgress />
       ) : (
-        <Stack container gap={3} direction={"column"}>
+        <Stack container gap={4} direction={"column"}>
           <Box>
             <Button
               variant="contained"
               color="primary"
               fullWidth
               onClick={handlePollSubmit}
+              sx={{ marginTop: "20px" }}
             >
               Submit
             </Button>
           </Box>
-          <Grid container gap={3}>
+          <Grid container gap={7}>
             {renderDishCards()}
           </Grid>
         </Stack>

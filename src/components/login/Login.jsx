@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { TextField, Stack, Paper, Button } from "@mui/material";
+import { TextField, Stack, Paper, Button, Typography } from "@mui/material";
 import { runValidation } from "./loginValidation";
 import users from "../../userdata/users.json";
 import { useNavigate } from "react-router-dom";
@@ -60,6 +60,7 @@ const Login = () => {
       sx={{ width: "345px", padding: "10px" }}
     >
       <Stack spacing={2}>
+        <Typography variant="h3" color="initial">Login</Typography>
         <TextField
           id="username"
           label="Username"
