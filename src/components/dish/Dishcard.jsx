@@ -1,12 +1,8 @@
-import React, { useState, useContext, useEffect } from "react";
-import {
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  CardActions,
-  Button,
-} from "@mui/material";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import React, { useState, useEffect } from "react";
 
 const Dishcard = ({
   id,
@@ -16,36 +12,22 @@ const Dishcard = ({
   polledDishHandler,
   selected,
 }) => {
-  const [rank1Selected, setRank1Selected] = useState(
-    selected?.rank === 30 ? true : false
-  );
-  const [rank2Selected, setRank2Selected] = useState(
-    selected?.rank === 20 ? true : false
-  );
-  const [rank3Selected, setRank3Selected] = useState(
-    selected?.rank === 10 ? true : false
-  );
+  const [selectedRank, setSelectedRank] = useState(selected ? +selected : 0);
 
-  const handlePolling = (rank) => {
-    if (rank === 30) {
-      setRank1Selected(!rank1Selected);
-      setRank2Selected(false);
-      setRank3Selected(false);
-    } else if (rank === 20) {
-      setRank1Selected(false);
-      setRank2Selected(!rank2Selected);
-      setRank3Selected(false);
-    } else if (rank === 10) {
-      setRank1Selected(false);
-      setRank2Selected(false);
-      setRank3Selected(!rank3Selected);
-    }
-
-    polledDishHandler({ id, rank });
+  const handleSelectedRank = (e) => {
+    polledDishHandler({ id, rank: +e.target.value });
   };
 
+  useEffect(() => {
+    if (selected?.id === id) {
+      setSelectedRank(selected.rank);
+    } else {
+      setSelectedRank(0);
+    }
+  }, [selected]);
+
   return (
-    <Card sx={{ maxWidth: 345, height: "100%" }}>
+    <Card sx={{ maxWidth: 345 }}>
       <CardMedia sx={{ height: 140 }} image={image} title={description} />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
@@ -55,32 +37,34 @@ const Dishcard = ({
           {description}
         </Typography>
       </CardContent>
-      <CardActions>
-        <Button
-          size="larger"
-          variant="contained"
-          onClick={() => handlePolling(30)}
-          sx={{ bgcolor: rank1Selected ? "yellow" : "primary" }}
-        >
-          Rank 1
-        </Button>
-        <Button
-          size="larger"
-          variant="contained"
-          onClick={() => handlePolling(20)}
-          sx={{ bgcolor: rank2Selected ? "yellow" : "primary" }}
-        >
-          Rank 2
-        </Button>
-        <Button
-          size="larger"
-          variant="contained"
-          onClick={() => handlePolling(10)}
-          sx={{ bgcolor: rank3Selected ? "yellow" : "primary" }}
-        >
-          Rank 3
-        </Button>
-      </CardActions>
+
+      <label htmlFor={`${id}_RANK1`}>RANK 1 </label>
+      <input
+        type="radio"
+        name={id}
+        id={`${id}_RANK1`}
+        value={30}
+        checked={selectedRank === 30}
+        onChange={handleSelectedRank}
+      />
+      <label htmlFor={`${id}_RANK2`}>RANK 2 </label>
+      <input
+        type="radio"
+        name={id}
+        id={`${id}_RANK2`}
+        value={20}
+        checked={selectedRank === 20}
+        onChange={handleSelectedRank}
+      />
+      <label htmlFor={`${id}_RANK3`}>RANK 3 </label>
+      <input
+        type="radio"
+        name={id}
+        id={`${id}_RANK3`}
+        value={10}
+        checked={selectedRank === 10}
+        onChange={handleSelectedRank}
+      />
     </Card>
   );
 };

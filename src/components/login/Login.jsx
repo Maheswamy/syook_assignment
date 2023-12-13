@@ -34,6 +34,7 @@ const Login = () => {
 
       if (authenicationResult) {
         userDispatch({ type: "SET_USER", payload: authenicationResult });
+        userDispatch({type:'SET_LOGGEDIN_VOTES',payload:JSON.parse(localStorage.getItem(`${authenicationResult.username}`))})
         localStorage.setItem("user", JSON.stringify(authenicationResult));
         if (localStorage.getItem("dishes")) {
           dishDispatch({
